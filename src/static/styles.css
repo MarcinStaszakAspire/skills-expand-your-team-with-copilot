@@ -617,6 +617,9 @@ footer {
   position: absolute;
   top: 10px;
   right: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 #user-status {
@@ -663,4 +666,38 @@ footer {
 
 #logout-button:hover {
   background-color: rgba(255, 255, 255, 0.3);
+}
+
+/* Dark mode */
+body.dark-mode {
+  --background: #121212;
+  --surface: #1e1e1e;
+  --text-primary: #e0e0e0;
+  --text-secondary: #aaaaaa;
+  --border: #333333;
+  --border-light: #2a2a2a;
+  --border-focus: #444444;
+  --success-light: #1a2e1a;
+  --warning-light: #2a2010;
+  --error-light: #2d1515;
+  --info-light: #0d1f22;
+}
+
+body.dark-mode h3,
+body.dark-mode .activity-card h4,
+body.dark-mode .participants-list h5 {
+  color: #9fa8da;
+}
+
+body.dark-mode input[type="text"],
+body.dark-mode input[type="email"],
+body.dark-mode input[type="password"] {
+  background-color: #2a2a2a;
+  color: var(--text-primary);
+  border-color: var(--border);
+}
+
+body.dark-mode .search-box input {
+  background-color: #2a2a2a;
+  color: var(--text-primary);
 }
