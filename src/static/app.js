@@ -568,6 +568,25 @@ document.addEventListener("DOMContentLoaded", () => {
           </div>
         `
         }
+        <div class="share-container">
+          <button class="share-button" title="Share this activity">
+            <span>&#8679;</span> Share
+          </button>
+          <div class="share-menu hidden">
+            <a class="share-option share-twitter" href="#" target="_blank" rel="noopener noreferrer">
+              𝕏 Twitter
+            </a>
+            <a class="share-option share-whatsapp" href="#" target="_blank" rel="noopener noreferrer">
+              💬 WhatsApp
+            </a>
+            <a class="share-option share-facebook" href="#" target="_blank" rel="noopener noreferrer">
+              📘 Facebook
+            </a>
+            <button class="share-option share-copy">
+              🔗 Copy Link
+            </button>
+          </div>
+        </div>
       </div>
     `;
 
@@ -586,6 +605,66 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
+
+    // Add share button functionality
+    const shareButton = activityCard.querySelector(".share-button");
+    const shareMenu = activityCard.querySelector(".share-menu");
+    const shareText = `Check out "${name}" at Mergington High School!\n${details.description}\nSchedule: ${formattedSchedule}`;
+    const shareUrl = window.location.href;
+
+    shareButton.addEventListener("click", (event) => {
+      event.stopPropagation();
+      // Use native Web Share API if available (e.g. on mobile)
+      if (navigator.share) {
+        navigator.share({
+          title: `${name} - Mergington High School`,
+          text: shareText,
+          url: shareUrl,
+        }).catch((err) => {
+          // Only show an error if sharing actually failed (not if the user cancelled)
+          if (err.name !== "AbortError") {
+            showMessage("Could not share this activity. Please try again.", "error");
+          }
+        });
+      } else {
+        // Toggle the fallback share menu
+        shareMenu.classList.toggle("hidden");
+      }
+    });
+
+    activityCard.querySelector(".share-twitter").addEventListener("click", (event) => {
+      event.preventDefault();
+      const tweetUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
+      window.open(tweetUrl, "_blank", "noopener,noreferrer");
+      shareMenu.classList.add("hidden");
+    });
+
+    activityCard.querySelector(".share-whatsapp").addEventListener("click", (event) => {
+      event.preventDefault();
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(shareText + "\n" + shareUrl)}`;
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      shareMenu.classList.add("hidden");
+    });
+
+    activityCard.querySelector(".share-facebook").addEventListener("click", (event) => {
+      event.preventDefault();
+      const fbUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}&quote=${encodeURIComponent(shareText)}`;
+      window.open(fbUrl, "_blank", "noopener,noreferrer");
+      shareMenu.classList.add("hidden");
+    });
+
+    activityCard.querySelector(".share-copy").addEventListener("click", () => {
+      shareMenu.classList.add("hidden");
+      navigator.clipboard.writeText(`${shareText}\n${shareUrl}`).then(() => {
+        const copyBtn = activityCard.querySelector(".share-copy");
+        copyBtn.textContent = "✅ Copied!";
+        setTimeout(() => {
+          copyBtn.textContent = "🔗 Copy Link";
+        }, 2000);
+      }).catch(() => {
+        showMessage("Could not copy to clipboard. Please try again.", "error");
+      });
+    });
 
     activitiesList.appendChild(activityCard);
   }
@@ -860,6 +939,13 @@ document.addEventListener("DOMContentLoaded", () => {
     setDayFilter,
     setTimeRangeFilter,
   };
+
+  // Close any open share menus when clicking outside
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".share-menu:not(.hidden)").forEach((menu) => {
+      menu.classList.add("hidden");
+    });
+  });
 
   // Initialize app
   checkAuthentication();
